@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Edit Provider Profile{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <div class="page-header center">
+            <h1>Edit Provider Profile</h1>
+        </div>
+        <div class="card">
+            <form method="POST" class="form-stack">
+                <div class="form-group">
+                    <label for="hourly_rate">Hourly Rate (€)</label>
+                    <input type="number" id="hourly_rate" name="hourly_rate" min="5" max="200" step="1" value="{{ profile.hourly_rate|int }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="specialties">Specialties</label>
+                    <input type="text" id="specialties" name="specialties" value="{{ profile.specialties }}" required>
+                    <small class="form-help">Comma-separated</small>
+                </div>
+                <div class="form-group">
+                    <label for="availability">Availability</label>
+                    <input type="text" id="availability" name="availability" value="{{ profile.availability }}">
+                </div>
+                <div class="form-group">
+                    <label for="experience_summary">Experience & Background</label>
+                    <textarea id="experience_summary" name="experience_summary" rows="4">{{ profile.experience_summary }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="is_active" {{ 'checked' if profile.is_active }}>
+                        Profile is active and visible to clients
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

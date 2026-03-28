@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Find Your TalkBuddy{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<section class="page-section">
+    <div class="container">
+        <div class="page-header center">
+            <h1>Find Your TalkBuddy</h1>
+            <p class="text-muted">Discover verified companions for meaningful conversations</p>
+        </div>
+
+        <div class="search-bar-container">
+            <form method="GET" class="search-bar">
+                <div class="search-input-wrapper">
+                    <span class="material-icons-outlined">search</span>
+                    <input type="text" name="q" placeholder="Search by name, interests, or specialties..." value="{{ request.args.get('q', '') }}">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <div class="view-toggle">
+            <button class="view-toggle-btn {{ 'active' if view == 'list' }}" data-view="list">
+                <span class="material-icons-outlined">view_list</span> List
+            </button>
+            <button class="view-toggle-btn {{ 'active' if view == 'map' }}" data-view="map">
+                <span class="material-icons-outlined">map</span> Map
+            </button>
+        </div>
+
+        <div class="search-layout">
+            <aside class="search-filters">
+                <form method="GET" id="filterForm">
+                    <input type="hidden" name="q" value="{{ request.args.get('q', '') }}">
+                    <input type="hidden" name="view" id="viewInput" value="{{ view }}">
+                    <h3>Filters</h3>
+
+                    <div class="filter-group">
+                        <label>City</label>
+                        <input type="text" name="city" placeholder="e.g. Amsterdam" value="{{ request.args.get('city', '') }}">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Language</label>
+                        <select name="language">
+                            <option value="">All Languages</option>
+                            {% for lang in ['English', 'Dutch', 'German', 'Spanish', 'French', 'Arabic', 'Mandarin', 'Swedish'] %}
+                            <option value="{{ lang }}" {{ 'selected' if request.args.get('language') == lang }}>{{ lang }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Specialty</label>
+                        <select name="specialty">
+                            <option value="">All Specialties</option>
+                            {% for spec in ['Coffee Chat', 'Walking Buddy', 'Deep Conversations', 'Emotional Support', 'Networking', 'Career Advice', 'Language Practice', 'Social Events'] %}
+                            <option value="{{ spec }}" {{ 'selected' if request.args.get('specialty') == spec }}>{{ spec }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Price Range (€/hr)</label>
+                        <div class="price-range">
+                            <input type="number" name="min_rate" placeholder="Min" min="0" value="{{ request.args.get('min_rate', '') }}">
+                            <span>—</span>
+                            <input type="number" name="max_rate" placeholder="Max" min="0" value="{{ request.args.get('max_rate', '') }}">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select name="sort">
+                            <option value="rating" {{ 'selected' if request.args.get('sort') == 'rating' }}>Top Rated</option>
+                            <option value="price_low" {{ 'selected' if request.args.get('sort') == 'price_low' }}>Price: Low to High</option>
+                            <option value="price_high" {{ 'selected' if request.args.get('sort') == 'price_high' }}>Price: High to Low</option>
+                            <option value="bookings" {{ 'selected' if request.args.get('sort') == 'bookings' }}>Most Booked</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Apply Filters</button>
+                    <a href="{{ url_for('search') }}" class="btn btn-outline btn-full mt-sm">Clear All</a>
+                </form>
+            </aside>
+
+            <div class="search-results">
+                <p class="results-count">{{ providers|length }} TalkBudd{{ 'y' if providers|length == 1 else 'ies' }} found</p>
+
+                <div id="listView" class="search-view {{ '' if view == 'list' else 'hidden' }}">
+                    {% if providers %}
+                        <div class="providers-grid">
+                            {% for provider in providers %}
+                            <a href="{{ url_for('provider_profile', user_id=provider.id) }}" class="provider-card">
+                                <div class="provider-avatar">
+                                    <div class="avatar-placeholder">{{ provider.name[0] }}</div>
+                                    {% if provider.is_verified %}
+                                        <span class="verified-badge" title="Verified">✓</span>
+                                    {% endif %}
+                                </div>
+                                <div class="provider-info">
+                                    <h3>{{ provider.name }}</h3>
+                                    <p class="provider-city">
+                                        <span class="material-icons-outlined">location_on</span> {{ provider.city }}
+                                    </p>
+                                    <p class="provider-bio">{{ provider.bio[:120] }}{% if provider.bio|length > 120 %}...{% endif %}</p>
+                                    <div class="provider-tags">
+                                        {% for spec in provider.provider_profile.specialties_list[:3] %}
+                                            <span class="tag">{{ spec }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="provider-meta">
+                                        <span class="languages-small">
+                                            <span class="material-icons-outlined">translate</span>
+                                            {{ provider.languages_list[:2]|join(', ') }}
+                                        </span>
+                                    </div>
+                                    <div class="provider-footer">
+                                        <span class="rating">★ {{ "%.1f"|format(provider.provider_profile.rating_avg) }} <small>({{ provider.provider_profile.rating_count }})</small></span>
+                                        <span class="price">€{{ "%.0f"|format(provider.provider_profile.hourly_rate) }}/hr</span>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state large">
+                            <span class="material-icons-outlined">search_off</span>
+                            <h3>No results found</h3>
+                            <p>Try adjusting your filters or search terms</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div id="mapView" class="search-view {{ '' if view == 'map' else 'hidden' }}">
+                    <div id="providerMap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function() {
+    var providers = {{ providers_json|safe }};
+    var viewBtns = document.querySelectorAll('.view-toggle-btn');
+    var listView = document.getElementById('listView');
+    var mapView  = document.getElementById('mapView');
+    var viewInput = document.getElementById('viewInput');
+    var map = null;
+
+    function switchView(view) {
+        viewBtns.forEach(function(b) { b.classList.toggle('active', b.dataset.view === view); });
+        listView.classList.toggle('hidden', view !== 'list');
+        mapView.classList.toggle('hidden', view !== 'map');
+        viewInput.value = view;
+
+        if (view === 'map' && !map) {
+            initMap();
+        } else if (view === 'map' && map) {
+            map.invalidateSize();
+        }
+    }
+
+    viewBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() { switchView(this.dataset.view); });
+    });
+
+    function initMap() {
+        map = L.map('providerMap').setView([52.1, 4.9], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 18
+        }).addTo(map);
+
+        var bounds = [];
+
+        providers.forEach(function(p) {
+            if (!p.lat || !p.lng) return;
+
+            var tags = p.specialties.map(function(s) { return '<span class="map-tag">' + s + '</span>'; }).join('');
+            var verified = p.verified ? ' <span class="map-verified">✓</span>' : '';
+
+            var popup = '<div class="map-popup">' +
+                '<div class="map-popup-header">' +
+                    '<div class="map-popup-avatar">' + p.initial + '</div>' +
+                    '<div>' +
+                        '<strong>' + p.name + '</strong>' + verified +
+                        '<div class="map-popup-city"><span class="material-icons-outlined" style="font-size:14px;vertical-align:middle;">location_on</span> ' + p.city + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<p class="map-popup-bio">' + p.bio + '</p>' +
+                '<div class="map-popup-tags">' + tags + '</div>' +
+                '<div class="map-popup-footer">' +
+                    '<span class="map-popup-rating">★ ' + p.rating + ' <small>(' + p.rating_count + ')</small></span>' +
+                    '<span class="map-popup-price">€' + p.rate + '/hr</span>' +
+                '</div>' +
+                '<a href="/provider/' + p.id + '" class="map-popup-link">View Profile →</a>' +
+            '</div>';
+
+            var icon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div class="marker-pin"><span>' + p.initial + '</span></div>',
+                iconSize: [36, 44],
+                iconAnchor: [18, 44],
+                popupAnchor: [0, -40]
+            });
+
+            L.marker([p.lat, p.lng], { icon: icon })
+                .addTo(map)
+                .bindPopup(popup, { maxWidth: 300, className: 'custom-popup' });
+
+            bounds.push([p.lat, p.lng]);
+        });
+
+        if (bounds.length > 0) {
+            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+        }
+    }
+
+    if ('{{ view }}' === 'map') {
+        initMap();
+    }
+})();
+</script>
+{% endblock %}

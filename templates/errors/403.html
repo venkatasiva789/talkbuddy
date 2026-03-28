@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Access Denied{% endblock %}
+{% block content %}
+<section class="error-section">
+    <div class="container narrow text-center">
+        <div class="error-icon">🔒</div>
+        <h1>403 — Access Denied</h1>
+        <p>You don't have permission to access this page.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">Go Home</a>
+    </div>
+</section>
+{% endblock %}

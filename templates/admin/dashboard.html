@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p class="text-muted">Platform overview and moderation</p>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="material-icons-outlined">people</span>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <span class="material-icons-outlined">face</span>
+                <div class="stat-value">{{ total_providers }}</div>
+                <div class="stat-label">Providers</div>
+            </div>
+            <div class="stat-card">
+                <span class="material-icons-outlined">event</span>
+                <div class="stat-value">{{ total_bookings }}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card {{ 'alert' if pending_reports > 0 }}">
+                <span class="material-icons-outlined">report</span>
+                <div class="stat-value">{{ pending_reports }}</div>
+                <div class="stat-label">Pending Reports</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dash-card wide">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">flag</span>
+                    <h3>Reports</h3>
+                </div>
+                {% if recent_reports %}
+                    <div class="admin-table">
+                        {% for r in recent_reports %}
+                        <div class="admin-row">
+                            <div class="admin-info">
+                                <strong>{{ r.reporter.name }}</strong> reported <strong>{{ r.reported.name }}</strong>
+                                <span class="text-muted">· {{ r.reason }} · {{ r.created_at.strftime('%b %d') }}</span>
+                                {% if r.description %}
+                                <p class="admin-desc">{{ r.description[:200] }}</p>
+                                {% endif %}
+                            </div>
+                            <span class="status-badge status-{{ r.status }}">{{ r.status | capitalize }}</span>
+                            {% if r.status == 'pending' %}
+                            <div class="admin-actions">
+                                <form method="POST" action="{{ url_for('resolve_report', report_id=r.id) }}" style="display:inline">
+                                    <input type="hidden" name="action" value="warn">
+                                    <button class="btn btn-sm btn-outline">Warn</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('resolve_report', report_id=r.id) }}" style="display:inline">
+                                    <input type="hidden" name="action" value="ban">
+                                    <button class="btn btn-sm btn-danger">Ban User</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('resolve_report', report_id=r.id) }}" style="display:inline">
+                                    <input type="hidden" name="action" value="dismiss">
+                                    <button class="btn btn-sm btn-outline">Dismiss</button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <span class="material-icons-outlined">verified_user</span>
+                        <p>No reports. All clear!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">person_add</span>
+                    <h3>Recent Users</h3>
+                </div>
+                <div class="admin-table">
+                    {% for u in recent_users %}
+                    <div class="admin-row compact">
+                        <div class="admin-info">
+                            <strong>{{ u.name }}</strong>
+                            <span class="text-muted">{{ u.email }} · {{ u.city }}</span>
+                        </div>
+                        <div class="admin-badges">
+                            {% if u.is_provider %}<span class="tag small">Provider</span>{% endif %}
+                            {% if u.is_verified %}<span class="tag small verified">Verified</span>{% endif %}
+                            {% if not u.is_verified %}
+                            <form method="POST" action="{{ url_for('verify_user', user_id=u.id) }}" style="display:inline">
+                                <button class="btn btn-sm btn-outline">Verify</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

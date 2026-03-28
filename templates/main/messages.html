@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <h1>Messages</h1>
+        </div>
+
+        {% if conversations %}
+            <div class="conversations-list">
+                {% for conv in conversations %}
+                <a href="{{ url_for('conversation', user_id=conv.user.id) }}" class="conversation-item {{ 'unread' if conv.unread > 0 }}">
+                    <div class="avatar-placeholder">{{ conv.user.name[0] }}</div>
+                    <div class="conv-info">
+                        <div class="conv-header">
+                            <strong>{{ conv.user.name }}</strong>
+                            {% if conv.last_message %}
+                            <span class="conv-time">{{ conv.last_message.created_at.strftime('%b %d') }}</span>
+                            {% endif %}
+                        </div>
+                        {% if conv.last_message %}
+                        <p class="conv-preview">
+                            {% if conv.last_message.sender_id == current_user.id %}You: {% endif %}
+                            {{ conv.last_message.content[:80] }}{% if conv.last_message.content|length > 80 %}...{% endif %}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% if conv.unread > 0 %}
+                    <span class="badge">{{ conv.unread }}</span>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state large">
+                <span class="material-icons-outlined">chat_bubble_outline</span>
+                <h3>No conversations yet</h3>
+                <p>Start a conversation by messaging a TalkBuddy from their profile</p>
+                <a href="{{ url_for('search') }}" class="btn btn-primary">Find People</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

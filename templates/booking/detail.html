@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Booking #{{ booking.id }}{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <div class="page-header">
+            <div>
+                <h1>Booking Details</h1>
+                <p class="text-muted">Booking #{{ booking.id }}</p>
+            </div>
+            <span class="status-badge status-{{ booking.status }} large">{{ booking.status | capitalize }}</span>
+        </div>
+
+        <div class="card">
+            <div class="booking-detail-grid">
+                <div class="detail-section">
+                    <h3>Session Info</h3>
+                    <div class="detail-row">
+                        <span class="material-icons-outlined">calendar_today</span>
+                        <div>
+                            <strong>{{ booking.date.strftime('%A, %B %d, %Y') }}</strong>
+                            <span>{{ booking.start_time }} · {{ booking.duration_hours }} hour{{ 's' if booking.duration_hours > 1 }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <span class="material-icons-outlined">category</span>
+                        <div>
+                            <strong>{{ booking.meeting_type | capitalize }}</strong>
+                        </div>
+                    </div>
+                    {% if booking.meeting_location %}
+                    <div class="detail-row">
+                        <span class="material-icons-outlined">location_on</span>
+                        <div>
+                            <strong>Location</strong>
+                            <span>{{ booking.meeting_location }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="detail-row">
+                        <span class="material-icons-outlined">euro</span>
+                        <div>
+                            <strong>€{{ "%.2f"|format(booking.total_price) }}</strong>
+                            <span>Total price</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>People</h3>
+                    <div class="people-cards">
+                        <div class="person-card">
+                            <div class="avatar-placeholder small">{{ booking.client.name[0] }}</div>
+                            <div>
+                                <strong>{{ booking.client.name }}</strong>
+                                <span class="text-muted">Client</span>
+                            </div>
+                            {% if current_user.id != booking.client.id %}
+                            <a href="{{ url_for('conversation', user_id=booking.client.id) }}" class="btn btn-sm btn-outline">Message</a>
+                            {% endif %}
+                        </div>
+                        <div class="person-card">
+                            <div class="avatar-placeholder small">{{ booking.provider.name[0] }}</div>
+                            <div>
+                                <strong>{{ booking.provider.name }}</strong>
+                                <span class="text-muted">Provider</span>
+                            </div>
+                            {% if current_user.id != booking.provider.id %}
+                            <a href="{{ url_for('conversation', user_id=booking.provider.id) }}" class="btn btn-sm btn-outline">Message</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if booking.notes %}
+                <div class="detail-section">
+                    <h3>Notes</h3>
+                    <p>{{ booking.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="booking-actions-full">
+                {% if booking.status == 'pending' and booking.provider_id == current_user.id %}
+                    <form method="POST" action="{{ url_for('confirm_booking', booking_id=booking.id) }}" style="display:inline">
+                        <button class="btn btn-primary btn-lg">Accept Booking</button>
+                    </form>
+                {% endif %}
+                {% if booking.status == 'confirmed' %}
+                    <form method="POST" action="{{ url_for('complete_booking', booking_id=booking.id) }}" style="display:inline">
+                        <button class="btn btn-primary btn-lg">Mark as Completed</button>
+                    </form>
+                {% endif %}
+                {% if booking.status in ['pending', 'confirmed'] %}
+                    <form method="POST" action="{{ url_for('cancel_booking', booking_id=booking.id) }}" style="display:inline" onsubmit="return confirm('Are you sure you want to cancel?')">
+                        <button class="btn btn-danger">Cancel Booking</button>
+                    </form>
+                {% endif %}
+                {% if booking.status == 'completed' and booking.client_id == current_user.id and not booking.review %}
+                    <a href="{{ url_for('write_review', booking_id=booking.id) }}" class="btn btn-primary btn-lg">Write a Review</a>
+                {% endif %}
+                {% if booking.review %}
+                    <div class="review-summary">
+                        <h4>Your Review</h4>
+                        <div class="review-rating">{% for i in range(booking.review.rating) %}★{% endfor %}{% for i in range(5 - booking.review.rating) %}☆{% endfor %}</div>
+                        {% if booking.review.comment %}<p>{{ booking.review.comment }}</p>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

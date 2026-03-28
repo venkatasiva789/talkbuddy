@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}TalkBuddy — Book Real People for Meaningful Connections{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Real Conversations.<br><span class="gradient-text">Real People.</span></h1>
+            <p class="hero-subtitle">Book verified companions for coffee, walks, deep talks, and genuine human connection. Because everyone deserves to be heard.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">Find Your TalkBuddy</a>
+                <a href="{{ url_for('register') }}" class="btn btn-outline btn-lg">Join Free</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <strong>500+</strong>
+                    <span>Verified Buddies</span>
+                </div>
+                <div class="stat">
+                    <strong>2,000+</strong>
+                    <span>Conversations</span>
+                </div>
+                <div class="stat">
+                    <strong>4.8 ★</strong>
+                    <span>Average Rating</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">How TalkBuddy Works</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Browse & Discover</h3>
+                <p>Search for companions by city, language, interests, and specialties. Read reviews and find your perfect match.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h3>Book a Session</h3>
+                <p>Choose your date, time, and meeting type — coffee, walk, deep talk, or social event. Pay securely in-app.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Connect & Enjoy</h3>
+                <p>Meet your TalkBuddy in person for a meaningful conversation. Rate your experience afterward.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Safe & Verified</h3>
+                <p>All providers are ID-verified. Safety check-ins, reviews, and a dedicated trust team keep you safe.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="providers-section">
+    <div class="container">
+        <h2 class="section-title">Top-Rated TalkBuddies</h2>
+        <p class="section-subtitle">Meet some of our most loved companions</p>
+        <div class="providers-grid">
+            {% for provider in providers %}
+            <a href="{{ url_for('provider_profile', user_id=provider.id) }}" class="provider-card">
+                <div class="provider-avatar">
+                    <div class="avatar-placeholder">{{ provider.name[0] }}</div>
+                    {% if provider.is_verified %}
+                        <span class="verified-badge" title="Verified">✓</span>
+                    {% endif %}
+                </div>
+                <div class="provider-info">
+                    <h3>{{ provider.name }}</h3>
+                    <p class="provider-city">
+                        <span class="material-icons-outlined">location_on</span> {{ provider.city }}
+                    </p>
+                    <p class="provider-bio">{{ provider.bio[:100] }}{% if provider.bio|length > 100 %}...{% endif %}</p>
+                    <div class="provider-tags">
+                        {% for spec in provider.provider_profile.specialties_list[:3] %}
+                            <span class="tag">{{ spec }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="provider-footer">
+                        <span class="rating">★ {{ "%.1f"|format(provider.provider_profile.rating_avg) }} <small>({{ provider.provider_profile.rating_count }})</small></span>
+                        <span class="price">€{{ "%.0f"|format(provider.provider_profile.hourly_rate) }}/hr</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-lg">
+            <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">Browse All TalkBuddies</a>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <h2>Ready to share your gift of conversation?</h2>
+            <p>Become a TalkBuddy provider and earn money by being yourself. Help people feel less lonely while doing what you love.</p>
+            <a href="{{ url_for('register') }}" class="btn btn-white btn-lg">Become a Provider</a>
+        </div>
+    </div>
+</section>
+
+<section class="trust-section">
+    <div class="container">
+        <h2 class="section-title">Your Safety Comes First</h2>
+        <div class="trust-grid">
+            <div class="trust-item">
+                <span class="material-icons-outlined trust-icon">verified_user</span>
+                <h4>ID Verification</h4>
+                <p>Every provider goes through identity verification before they can offer services.</p>
+            </div>
+            <div class="trust-item">
+                <span class="material-icons-outlined trust-icon">star</span>
+                <h4>Reviews & Ratings</h4>
+                <p>Transparent review system so you can make informed choices.</p>
+            </div>
+            <div class="trust-item">
+                <span class="material-icons-outlined trust-icon">shield</span>
+                <h4>Safety Check-ins</h4>
+                <p>Optional location sharing and safety check-in during meetings.</p>
+            </div>
+            <div class="trust-item">
+                <span class="material-icons-outlined trust-icon">support_agent</span>
+                <h4>24/7 Support</h4>
+                <p>Our dedicated trust & safety team is always available to help.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

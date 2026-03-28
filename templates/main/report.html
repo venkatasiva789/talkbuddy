@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Report User{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <div class="page-header center">
+            <h1>Report {{ reported.name }}</h1>
+            <p class="text-muted">Help us keep TalkBuddy safe for everyone</p>
+        </div>
+        <div class="card">
+            <form method="POST" class="form-stack">
+                <div class="form-group">
+                    <label for="reason">Reason</label>
+                    <select id="reason" name="reason" required>
+                        <option value="">Select a reason...</option>
+                        <option value="inappropriate">Inappropriate behavior</option>
+                        <option value="harassment">Harassment</option>
+                        <option value="fake_profile">Fake profile</option>
+                        <option value="scam">Scam or fraud</option>
+                        <option value="no_show">No-show</option>
+                        <option value="safety">Safety concern</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Please describe what happened in detail..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger btn-full">Submit Report</button>
+                <p class="text-center text-muted mt-sm">Reports are reviewed by our trust & safety team within 24 hours.</p>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

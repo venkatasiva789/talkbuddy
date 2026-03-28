@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <h1>My Bookings</h1>
+            <div class="tab-nav">
+                <a href="{{ url_for('my_bookings', role='client') }}" class="tab {{ 'active' if role == 'client' }}">As Client</a>
+                {% if current_user.is_provider %}
+                <a href="{{ url_for('my_bookings', role='provider') }}" class="tab {{ 'active' if role == 'provider' }}">As Provider</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if bookings %}
+            <div class="bookings-table">
+                {% for b in bookings %}
+                <a href="{{ url_for('booking_detail', booking_id=b.id) }}" class="booking-row">
+                    <div class="booking-date-badge {{ 'completed' if b.status == 'completed' }}">
+                        <span class="month">{{ b.date.strftime('%b') }}</span>
+                        <span class="day">{{ b.date.strftime('%d') }}</span>
+                    </div>
+                    <div class="booking-info">
+                        <strong>
+                            {% if role == 'client' %}
+                                {{ b.provider.name }}
+                            {% else %}
+                                {{ b.client.name }}
+                            {% endif %}
+                        </strong>
+                        <span>{{ b.start_time }} · {{ b.duration_hours }}h · {{ b.meeting_type | capitalize }}</span>
+                    </div>
+                    <div class="booking-price-col">€{{ "%.0f"|format(b.total_price) }}</div>
+                    <span class="status-badge status-{{ b.status }}">{{ b.status | capitalize }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state large">
+                <span class="material-icons-outlined">calendar_today</span>
+                <h3>No bookings yet</h3>
+                <p>{% if role == 'client' %}Find a TalkBuddy and book your first session!{% else %}Bookings from clients will appear here.{% endif %}</p>
+                {% if role == 'client' %}
+                <a href="{{ url_for('search') }}" class="btn btn-primary">Find a TalkBuddy</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

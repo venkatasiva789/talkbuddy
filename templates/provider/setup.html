@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Become a Provider{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <div class="page-header center">
+            <h1>Become a TalkBuddy Provider</h1>
+            <p class="text-muted">Share your gift of conversation and earn money doing what you love</p>
+        </div>
+
+        <div class="card">
+            <form method="POST" class="form-stack">
+                <div class="form-group">
+                    <label for="bio">About You</label>
+                    <textarea id="bio" name="bio" rows="4" placeholder="Tell people about yourself, your personality, and why you'd be a great conversation partner..." required>{{ current_user.bio }}</textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hourly_rate">Hourly Rate (€)</label>
+                        <input type="number" id="hourly_rate" name="hourly_rate" min="5" max="200" step="1" value="25" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialties">Specialties</label>
+                    <input type="text" id="specialties" name="specialties" placeholder="e.g. Coffee Chat, Walking Buddy, Deep Conversations, Career Advice" required>
+                    <small class="form-help">Comma-separated list of what you offer</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="availability">Availability</label>
+                    <input type="text" id="availability" name="availability" placeholder="e.g. Mon-Fri 10:00-18:00, Sat 12:00-17:00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience_summary">Experience & Background</label>
+                    <textarea id="experience_summary" name="experience_summary" rows="3" placeholder="What makes you qualified? Any relevant experience, training, or background?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" required>
+                        I agree to the <a href="#">Provider Terms</a> and confirm this platform is for social companionship only
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-full">Create Provider Profile</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

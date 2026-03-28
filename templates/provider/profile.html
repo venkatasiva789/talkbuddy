@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}{{ provider.name }} — TalkBuddy{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="profile-layout">
+            <div class="profile-main">
+                <div class="profile-header-card">
+                    <div class="profile-top">
+                        <div class="profile-avatar-large">
+                            <div class="avatar-placeholder large">{{ provider.name[0] }}</div>
+                            {% if provider.is_verified %}
+                                <span class="verified-badge large" title="Verified">✓</span>
+                            {% endif %}
+                        </div>
+                        <div class="profile-headline">
+                            <h1>{{ provider.name }}</h1>
+                            <p class="provider-city">
+                                <span class="material-icons-outlined">location_on</span> {{ provider.city }}
+                            </p>
+                            <div class="profile-stats">
+                                <span class="rating-large">★ {{ "%.1f"|format(provider.provider_profile.rating_avg) }}</span>
+                                <span class="text-muted">({{ provider.provider_profile.rating_count }} reviews)</span>
+                                <span class="divider">·</span>
+                                <span>{{ provider.provider_profile.total_bookings }} sessions</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-bio">
+                        <p>{{ provider.bio }}</p>
+                    </div>
+                    <div class="profile-details">
+                        {% if provider.languages %}
+                        <div class="detail-item">
+                            <span class="material-icons-outlined">translate</span>
+                            <div>
+                                <strong>Languages</strong>
+                                <p>{{ provider.languages }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if provider.interests %}
+                        <div class="detail-item">
+                            <span class="material-icons-outlined">interests</span>
+                            <div>
+                                <strong>Interests</strong>
+                                <p>{{ provider.interests }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if provider.provider_profile.availability %}
+                        <div class="detail-item">
+                            <span class="material-icons-outlined">schedule</span>
+                            <div>
+                                <strong>Availability</strong>
+                                <p>{{ provider.provider_profile.availability }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if provider.provider_profile.specialties %}
+                <div class="card">
+                    <h3>What I Offer</h3>
+                    <div class="specialties-grid">
+                        {% for spec in provider.provider_profile.specialties_list %}
+                        <div class="specialty-item">
+                            <span class="material-icons-outlined">check_circle</span>
+                            {{ spec }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if provider.provider_profile.experience_summary %}
+                <div class="card">
+                    <h3>About My Experience</h3>
+                    <p>{{ provider.provider_profile.experience_summary }}</p>
+                </div>
+                {% endif %}
+
+                <div class="card">
+                    <h3>Reviews ({{ reviews|length }})</h3>
+                    {% if reviews %}
+                        {% for review in reviews %}
+                        <div class="review-item">
+                            <div class="review-header">
+                                <strong>{{ review.reviewer.name }}</strong>
+                                <div class="review-rating">
+                                    {% for i in range(review.rating) %}★{% endfor %}{% for i in range(5 - review.rating) %}☆{% endfor %}
+                                </div>
+                                <span class="text-muted">{{ review.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                            {% if review.comment %}
+                                <p class="review-text">{{ review.comment }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No reviews yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <aside class="profile-sidebar">
+                <div class="booking-card sticky">
+                    <div class="booking-price">
+                        <span class="price-amount">€{{ "%.0f"|format(provider.provider_profile.hourly_rate) }}</span>
+                        <span class="price-unit">/ hour</span>
+                    </div>
+                    {% if current_user.is_authenticated and current_user.id != provider.id %}
+                        <a href="{{ url_for('create_booking', provider_id=provider.id) }}" class="btn btn-primary btn-full btn-lg">Book Now</a>
+                        <a href="{{ url_for('conversation', user_id=provider.id) }}" class="btn btn-outline btn-full mt-sm">
+                            <span class="material-icons-outlined">chat</span> Message
+                        </a>
+                    {% elif not current_user.is_authenticated %}
+                        <a href="{{ url_for('login') }}" class="btn btn-primary btn-full btn-lg">Log In to Book</a>
+                    {% endif %}
+                    <div class="booking-card-info">
+                        <div class="info-row">
+                            <span class="material-icons-outlined">verified_user</span>
+                            <span>{% if provider.is_verified %}Identity Verified{% else %}Pending Verification{% endif %}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-icons-outlined">event_available</span>
+                            <span>{{ provider.provider_profile.availability[:30] }}{% if provider.provider_profile.availability|length > 30 %}...{% endif %}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-icons-outlined">thumb_up</span>
+                            <span>{{ provider.provider_profile.total_bookings }} successful sessions</span>
+                        </div>
+                    </div>
+                    {% if current_user.is_authenticated and current_user.id != provider.id %}
+                    <a href="{{ url_for('report_user', user_id=provider.id) }}" class="link-subtle report-link">
+                        <span class="material-icons-outlined">flag</span> Report this user
+                    </a>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

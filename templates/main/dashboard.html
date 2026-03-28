@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>Welcome back, {{ current_user.name }}!</h1>
+                <p class="text-muted">Here's your activity overview</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('search') }}" class="btn btn-primary">Find a TalkBuddy</a>
+                {% if not current_user.is_provider %}
+                    <a href="{{ url_for('become_provider') }}" class="btn btn-outline">Become a Provider</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">event</span>
+                    <h3>Upcoming Bookings</h3>
+                </div>
+                {% if upcoming %}
+                    <div class="booking-list">
+                        {% for b in upcoming %}
+                        <a href="{{ url_for('booking_detail', booking_id=b.id) }}" class="booking-item">
+                            <div class="booking-date-badge">
+                                <span class="month">{{ b.date.strftime('%b') }}</span>
+                                <span class="day">{{ b.date.strftime('%d') }}</span>
+                            </div>
+                            <div class="booking-info">
+                                <strong>
+                                    {% if b.client_id == current_user.id %}
+                                        {{ b.provider.name }}
+                                    {% else %}
+                                        {{ b.client.name }}
+                                    {% endif %}
+                                </strong>
+                                <span>{{ b.start_time }} · {{ b.meeting_type | capitalize }} · €{{ "%.0f"|format(b.total_price) }}</span>
+                            </div>
+                            <span class="status-badge status-{{ b.status }}">{{ b.status | capitalize }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <span class="material-icons-outlined">calendar_today</span>
+                        <p>No upcoming bookings</p>
+                        <a href="{{ url_for('search') }}" class="btn btn-sm btn-primary">Find someone to talk to</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">history</span>
+                    <h3>Recent Sessions</h3>
+                </div>
+                {% if past %}
+                    <div class="booking-list">
+                        {% for b in past %}
+                        <a href="{{ url_for('booking_detail', booking_id=b.id) }}" class="booking-item">
+                            <div class="booking-date-badge completed">
+                                <span class="month">{{ b.date.strftime('%b') }}</span>
+                                <span class="day">{{ b.date.strftime('%d') }}</span>
+                            </div>
+                            <div class="booking-info">
+                                <strong>
+                                    {% if b.client_id == current_user.id %}
+                                        {{ b.provider.name }}
+                                    {% else %}
+                                        {{ b.client.name }}
+                                    {% endif %}
+                                </strong>
+                                <span>{{ b.meeting_type | capitalize }} · €{{ "%.0f"|format(b.total_price) }}</span>
+                            </div>
+                            {% if b.client_id == current_user.id and not b.review %}
+                                <a href="{{ url_for('write_review', booking_id=b.id) }}" class="btn btn-sm btn-outline">Review</a>
+                            {% elif b.review %}
+                                <span class="rating-small">★ {{ b.review.rating }}</span>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <span class="material-icons-outlined">emoji_people</span>
+                        <p>No past sessions yet</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">quick_contacts_mail</span>
+                    <h3>Quick Actions</h3>
+                </div>
+                <div class="quick-actions">
+                    <a href="{{ url_for('search') }}" class="quick-action">
+                        <span class="material-icons-outlined">search</span>
+                        <span>Find People</span>
+                    </a>
+                    <a href="{{ url_for('messages_inbox') }}" class="quick-action">
+                        <span class="material-icons-outlined">chat</span>
+                        <span>Messages{% if unread_count > 0 %} ({{ unread_count }}){% endif %}</span>
+                    </a>
+                    <a href="{{ url_for('edit_profile') }}" class="quick-action">
+                        <span class="material-icons-outlined">settings</span>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="{{ url_for('my_bookings') }}" class="quick-action">
+                        <span class="material-icons-outlined">list_alt</span>
+                        <span>All Bookings</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

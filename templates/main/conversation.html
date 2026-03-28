@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Chat with {{ other.name }}{% endblock %}
+
+{% block content %}
+<section class="chat-section">
+    <div class="container narrow">
+        <div class="chat-header">
+            <a href="{{ url_for('messages_inbox') }}" class="btn btn-sm btn-outline">
+                <span class="material-icons-outlined">arrow_back</span> Back
+            </a>
+            <div class="chat-user-info">
+                <div class="avatar-placeholder small">{{ other.name[0] }}</div>
+                <div>
+                    <strong>{{ other.name }}</strong>
+                    <span class="text-muted">{{ other.city }}</span>
+                </div>
+            </div>
+            {% if other.is_provider %}
+            <a href="{{ url_for('provider_profile', user_id=other.id) }}" class="btn btn-sm btn-outline">View Profile</a>
+            {% endif %}
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            {% if not messages %}
+                <div class="chat-empty">
+                    <p>Start the conversation! Say hello to {{ other.name }}.</p>
+                </div>
+            {% endif %}
+            {% for msg in messages %}
+            <div class="message {{ 'sent' if msg.sender_id == current_user.id else 'received' }}">
+                <div class="message-bubble">
+                    <p>{{ msg.content }}</p>
+                    <span class="message-time">{{ msg.created_at.strftime('%H:%M') }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <form method="POST" class="chat-input">
+            <input type="text" name="content" placeholder="Type a message..." required autocomplete="off" autofocus>
+            <button type="submit" class="btn btn-primary">
+                <span class="material-icons-outlined">send</span>
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const chatMessages = document.getElementById('chatMessages');
+if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+</script>
+{% endblock %}

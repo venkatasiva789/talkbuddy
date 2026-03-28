@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Book {{ provider.name }}{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <div class="page-header center">
+            <h1>Book a Session with {{ provider.name }}</h1>
+            <p class="text-muted">€{{ "%.0f"|format(provider.provider_profile.hourly_rate) }} per hour · {{ provider.city }}</p>
+        </div>
+
+        <div class="card">
+            <form method="POST" class="form-stack">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" required min="{{ now.strftime('%Y-%m-%d') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="start_time">Start Time</label>
+                        <input type="time" id="start_time" name="start_time" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="duration">Duration (hours)</label>
+                        <select id="duration" name="duration" onchange="updatePrice()">
+                            <option value="0.5">30 minutes</option>
+                            <option value="1" selected>1 hour</option>
+                            <option value="1.5">1.5 hours</option>
+                            <option value="2">2 hours</option>
+                            <option value="3">3 hours</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting_type">Meeting Type</label>
+                        <select id="meeting_type" name="meeting_type">
+                            <option value="coffee">☕ Coffee Chat</option>
+                            <option value="walk">🚶 Walk & Talk</option>
+                            <option value="talk">💬 Deep Conversation</option>
+                            <option value="social">🎉 Social Event</option>
+                            <option value="networking">🤝 Networking</option>
+                            <option value="other">📋 Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Meeting Location (optional)</label>
+                    <input type="text" id="location" name="location" placeholder="e.g. Vondelpark, Central Station café area...">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes for {{ provider.name }} (optional)</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="What would you like to talk about? Any preferences?"></textarea>
+                </div>
+
+                <div class="price-summary">
+                    <div class="price-line">
+                        <span>Rate</span>
+                        <span>€{{ "%.0f"|format(provider.provider_profile.hourly_rate) }}/hr</span>
+                    </div>
+                    <div class="price-line">
+                        <span>Duration</span>
+                        <span id="durationDisplay">1 hour</span>
+                    </div>
+                    <div class="price-line total">
+                        <span>Total</span>
+                        <span id="totalPrice">€{{ "%.0f"|format(provider.provider_profile.hourly_rate) }}</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-full">Send Booking Request</button>
+                <p class="text-center text-muted mt-sm">The provider will confirm your booking. You won't be charged until confirmed.</p>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const rate = {{ provider.provider_profile.hourly_rate }};
+function updatePrice() {
+    const dur = parseFloat(document.getElementById('duration').value);
+    const total = rate * dur;
+    document.getElementById('totalPrice').textContent = '€' + Math.round(total);
+    const labels = {'0.5': '30 minutes', '1': '1 hour', '1.5': '1.5 hours', '2': '2 hours', '3': '3 hours'};
+    document.getElementById('durationDisplay').textContent = labels[dur] || dur + ' hours';
+}
+</script>
+{% endblock %}

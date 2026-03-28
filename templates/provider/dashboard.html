@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Provider Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>Provider Dashboard</h1>
+                <p class="text-muted">Manage your bookings and profile</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('edit_provider') }}" class="btn btn-outline">Edit Profile</a>
+                <a href="{{ url_for('provider_profile', user_id=current_user.id) }}" class="btn btn-outline">View Public Profile</a>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="material-icons-outlined">star</span>
+                <div class="stat-value">{{ "%.1f"|format(current_user.provider_profile.rating_avg) }}</div>
+                <div class="stat-label">Rating</div>
+            </div>
+            <div class="stat-card">
+                <span class="material-icons-outlined">event_available</span>
+                <div class="stat-value">{{ current_user.provider_profile.total_bookings }}</div>
+                <div class="stat-label">Total Sessions</div>
+            </div>
+            <div class="stat-card">
+                <span class="material-icons-outlined">reviews</span>
+                <div class="stat-value">{{ current_user.provider_profile.rating_count }}</div>
+                <div class="stat-label">Reviews</div>
+            </div>
+            <div class="stat-card">
+                <span class="material-icons-outlined">euro</span>
+                <div class="stat-value">{{ "%.0f"|format(current_user.provider_profile.hourly_rate) }}</div>
+                <div class="stat-label">Rate/Hour</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">pending_actions</span>
+                    <h3>Pending Requests ({{ pending|length }})</h3>
+                </div>
+                {% if pending %}
+                    <div class="booking-list">
+                        {% for b in pending %}
+                        <div class="booking-item">
+                            <div class="booking-date-badge">
+                                <span class="month">{{ b.date.strftime('%b') }}</span>
+                                <span class="day">{{ b.date.strftime('%d') }}</span>
+                            </div>
+                            <div class="booking-info">
+                                <strong>{{ b.client.name }}</strong>
+                                <span>{{ b.start_time }} · {{ b.duration_hours }}h · {{ b.meeting_type | capitalize }}</span>
+                                <span class="text-muted">€{{ "%.0f"|format(b.total_price) }}</span>
+                            </div>
+                            <div class="booking-actions">
+                                <form method="POST" action="{{ url_for('confirm_booking', booking_id=b.id) }}" style="display:inline">
+                                    <button class="btn btn-sm btn-primary">Accept</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('cancel_booking', booking_id=b.id) }}" style="display:inline">
+                                    <button class="btn btn-sm btn-danger">Decline</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <span class="material-icons-outlined">inbox</span>
+                        <p>No pending requests</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">event</span>
+                    <h3>Confirmed Sessions ({{ confirmed|length }})</h3>
+                </div>
+                {% if confirmed %}
+                    <div class="booking-list">
+                        {% for b in confirmed %}
+                        <a href="{{ url_for('booking_detail', booking_id=b.id) }}" class="booking-item">
+                            <div class="booking-date-badge">
+                                <span class="month">{{ b.date.strftime('%b') }}</span>
+                                <span class="day">{{ b.date.strftime('%d') }}</span>
+                            </div>
+                            <div class="booking-info">
+                                <strong>{{ b.client.name }}</strong>
+                                <span>{{ b.start_time }} · {{ b.meeting_type | capitalize }}</span>
+                            </div>
+                            <span class="status-badge status-confirmed">Confirmed</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <span class="material-icons-outlined">event_busy</span>
+                        <p>No upcoming confirmed sessions</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="material-icons-outlined">rate_review</span>
+                    <h3>Recent Reviews</h3>
+                </div>
+                {% if reviews %}
+                    {% for review in reviews %}
+                    <div class="review-item compact">
+                        <div class="review-header">
+                            <strong>{{ review.reviewer.name }}</strong>
+                            <span class="review-rating">{% for i in range(review.rating) %}★{% endfor %}</span>
+                        </div>
+                        {% if review.comment %}
+                        <p class="review-text">{{ review.comment[:150] }}{% if review.comment|length > 150 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <span class="material-icons-outlined">star_outline</span>
+                        <p>No reviews yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
