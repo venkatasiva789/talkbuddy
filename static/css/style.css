@@ -94,13 +94,13 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 .nav-link {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 8px 12px;
+    gap: 5px;
+    padding: 8px 14px;
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
     font-size: 0.9rem;
@@ -109,6 +109,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
     position: relative;
 }
 .nav-link:hover { color: var(--primary); background: var(--bg-hover); }
+.nav-links .btn { margin-left: 8px; }
 .nav-link .material-icons-outlined { font-size: 20px; }
 
 .badge {
@@ -235,41 +236,63 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
+    gap: 8px;
+    padding: 12px 24px;
     border-radius: var(--radius-sm);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     border: 2px solid transparent;
     cursor: pointer;
     transition: all var(--transition);
     text-align: center;
     justify-content: center;
     white-space: nowrap;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
 }
 .btn-primary {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: var(--text-white);
+    box-shadow: 0 4px 14px rgba(108, 99, 255, 0.35);
 }
-.btn-primary:hover { background: var(--primary-dark); color: var(--text-white); transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    color: var(--text-white);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 99, 255, 0.45);
+}
 .btn-outline {
-    background: transparent;
+    background: var(--bg-white);
     color: var(--primary);
     border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
 }
-.btn-outline:hover { background: var(--primary); color: var(--text-white); }
-.btn-danger {
-    background: var(--secondary);
+.btn-outline:hover {
+    background: var(--primary);
     color: var(--text-white);
+    box-shadow: 0 4px 14px rgba(108, 99, 255, 0.3);
+    transform: translateY(-1px);
 }
-.btn-danger:hover { background: var(--secondary-dark); color: var(--text-white); }
+.btn-danger {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+    color: var(--text-white);
+    box-shadow: 0 4px 14px rgba(255, 107, 107, 0.35);
+}
+.btn-danger:hover {
+    background: linear-gradient(135deg, #ff8585 0%, var(--secondary) 100%);
+    color: var(--text-white);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.45);
+}
 .btn-white {
     background: white;
     color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.btn-white:hover { background: var(--bg); color: var(--primary-dark); transform: translateY(-1px); }
-.btn-sm { padding: 6px 14px; font-size: 0.82rem; }
-.btn-lg { padding: 14px 28px; font-size: 1rem; }
+.btn-white:hover { background: var(--bg); color: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow); }
+.btn-sm { padding: 8px 16px; font-size: 0.82rem; }
+.btn-lg { padding: 16px 32px; font-size: 1.05rem; }
 .btn-full { width: 100%; }
 
 /* ========================================================================
@@ -325,7 +348,9 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
     line-height: 1.7;
     margin-bottom: 32px;
 }
-.hero-actions { display: flex; gap: 12px; margin-bottom: 48px; flex-wrap: wrap; }
+.hero-actions { display: flex; gap: 16px; margin-bottom: 48px; flex-wrap: wrap; }
+.hero-actions .btn { padding: 14px 30px; font-size: 1rem; }
+.hero-actions .btn-white { border: 2px solid rgba(255,255,255,0.3); }
 .hero-stats {
     display: flex;
     gap: 40px;
@@ -528,6 +553,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 }
 .cta-card h2 { font-size: 2rem; margin-bottom: 16px; }
 .cta-card p { opacity: 0.9; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+.cta-card .btn { padding: 14px 32px; font-size: 1rem; }
 
 /* ========================================================================
    Trust Section
@@ -570,6 +596,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .auth-header h1 { font-size: 1.8rem; margin-bottom: 8px; }
 .auth-header p { color: var(--text-muted); }
 .auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-form .btn { padding: 14px 24px; font-size: 1rem; }
 .auth-footer { text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 0.9rem; }
 
 /* Demo section */
@@ -828,15 +855,22 @@ a.booking-item:hover, .booking-row:hover { background: var(--bg-hover); color: v
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 14px;
+    padding: 14px 16px;
     border-radius: var(--radius-sm);
     background: var(--bg);
     color: var(--text);
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     transition: all var(--transition);
+    border: 1px solid var(--border-light);
 }
-.quick-action:hover { background: var(--primary); color: white; }
+.quick-action:hover {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+    border-color: transparent;
+}
 .quick-action .material-icons-outlined { font-size: 22px; }
 
 /* ========================================================================
@@ -849,6 +883,7 @@ a.booking-item:hover, .booking-row:hover { background: var(--bg-hover); color: v
     max-width: 640px;
     margin: 0 auto;
 }
+.search-bar .btn { padding: 12px 28px; font-size: 0.95rem; }
 .search-input-wrapper {
     flex: 1;
     position: relative;
@@ -923,32 +958,33 @@ a.booking-item:hover, .booking-row:hover { background: var(--bg-hover); color: v
     gap: 4px;
     margin-bottom: 24px;
     background: var(--bg-card);
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     border-radius: var(--radius-full);
-    padding: 4px;
+    padding: 5px;
     width: fit-content;
+    box-shadow: var(--shadow-sm);
 }
 .view-toggle-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 20px;
+    gap: 7px;
+    padding: 10px 24px;
     border: none;
     border-radius: var(--radius-full);
     background: transparent;
     color: var(--text-secondary);
     font-family: var(--font);
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.92rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all var(--transition);
 }
-.view-toggle-btn .material-icons-outlined { font-size: 18px; }
+.view-toggle-btn .material-icons-outlined { font-size: 20px; }
 .view-toggle-btn:hover { color: var(--text); background: var(--bg-hover); }
 .view-toggle-btn.active {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: var(--text-white);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.35);
 }
 .search-view.hidden { display: none; }
 
