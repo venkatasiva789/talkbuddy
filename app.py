@@ -637,10 +637,11 @@ def forbidden(e):
 
 
 # ---------------------------------------------------------------------------
-# Main
+# Startup
 # ---------------------------------------------------------------------------
+os.makedirs(app.config.get("UPLOAD_FOLDER", "static/img/uploads"), exist_ok=True)
+with app.app_context():
+    db.create_all()
+
 if __name__ == "__main__":
-    os.makedirs(app.config.get("UPLOAD_FOLDER", "static/img/uploads"), exist_ok=True)
-    with app.app_context():
-        db.create_all()
     app.run(debug=True, port=5000)
